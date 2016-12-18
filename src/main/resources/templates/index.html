@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"/>
+    <meta charset="utf-8"/>
+    <title>Login Page - Ace Admin</title>
+
+    <meta name="description" content="User login page"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+
+    <!-- bootstrap & fontawesome -->
+    <link th:href="@{css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{font-awesome/css/font-awesome.min.cs}" rel="stylesheet"/>
+    <link th:href="@{fonts/fonts.googleapis.com.css}" rel="stylesheet"/>
+    <link th:href="@{css/ace.min.css}" rel="stylesheet"/>
+    <link th:href="@{css/ace-part2.min.css}" rel="stylesheet"/>
+    <link th:href="@{css/ace-rtl.min.css}" rel="stylesheet"/>
+    <link th:href="@{css/ace-ie.min.css}" rel="stylesheet"/>
+    <link th:href="@{js/html5shiv.min.js}" rel="stylesheet"/>
+    <link th:href="@{js/respond.min.js}" rel="stylesheet"/>
+    <style type="text/css">
+        body {
+            padding: 20px;
+        }
+
+        .row {
+            background: #fff;
+        }
+    </style>
+</head>
+<body class="no-skin">
+<div class="row">
+    <h2 align="center">管理满意度调查问卷</h2>
+</div>
+<div class="row" style="padding-top: 20px">
+    <div class="col-md-12">
+        <p>
+            亲爱的伙伴们:
+            <br/>
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;为了进一步加强员工沟通，了解管理现状，不断完善相关政策制度，针对管理人员在日常工作过程中的管理及工作态度进行相关的问卷调查，本次调查以匿名的形式提交，请表达真实的想法。
+        </p>
+    </div>
+</div>
+
+<div th:if="${not #lists.isEmpty(deparments)}">
+    <div class="row">
+        <hr/>
+        <div class="col-xs-4 col-sm-4">
+            <p>
+                请选择被调查人：
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <form role="form">
+            <div class="form-group col-xs-6 col-sm-2">
+                <select class="form-control" onchange="change(this.value)">
+                    <div th:each="deparment:${deparments}">
+                        <option th:text="${deparment}" th:value="${deparment}"></option>
+                    </div>
+                </select>
+            </div>
+        </form>
+
+        <form role="form">
+            <div class="form-group col-xs-6 col-sm-2" id="personForm">
+                <select class="form-control" id="person">
+                    <div th:each="person:${persons}">
+                        <option th:text="${person.name}" th:value="${person.name}"></option>
+                    </div>
+                </select>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div th:if="${not #lists.isEmpty(questionsList)}">
+    <div class="row" th:each="questions,stat:${questionsList}">
+        <div class="col-md-12">
+            <hr/>
+            <div class="col-xs-12 col-sm-12" th:id="'title'+${stat.index+1}">
+                <span th:text="${stat.index+1}"></span>
+                <span th:text="${questions.question}"></span>
+            </div>
+            <div class="col-xs-11 col-sm-2">
+                <input type="radio" value="5" th:name="'question'+${stat.index+1}" onclick="choose(this.value)"/> 5分
+            </div>
+            <div class="col-xs-11 col-sm-2">
+                <input type="radio" th:name="'question'+${stat.index+1}" value="4" onclick="choose(this.value)"/> 4分
+            </div>
+            <div class="col-xs-11 col-sm-2">
+                <input type="radio" th:name="'question'+${stat.index+1}" value="3" onclick="choose(this.value)"/> 3分
+            </div>
+            <div class="col-xs-11 col-sm-2">
+                <input type="radio" th:name="'question'+${stat.index+1}" value="2" onclick="choose(this.value)"/> 2分
+            </div>
+            <div class="col-xs-11 col-sm-2">
+                <input type="radio" th:name="'question'+${stat.index+1}" value="1" onclick="choose(this.value)"/> 1分
+            </div>
+            <br/>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <hr/>
+    <div class="container">
+        <div class="starter-template">
+            <input type="submit" class="btn btn-primary" value="提交" onclick="submit()"/>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{js/jquery.js}" type="text/javascript"></script>
+<script th:src="@{bootstrap/js/bootstrap.min.js}" type="text/javascript"></script>
+
+<script th:inline="javascript">
+    var res=[];
+    function change(department) {
+        $.post("/department/persons", {department: department}, function (result) {
+            $("#person").empty();
+            $.each(result, function () {
+                $("#person").append('<option value="' + this.name + '">' + this.name + '</option>');
+            })
+        });
+    }
+    function submit() {
+        var name = $("#person").val();
+        var i=0;
+        var notFull = [];
+        do{
+            i++;
+            var fen = $("input:radio[name='question"+i+"']:checked").val();
+            if(!fen){
+                notFull.push(i);
+                $()
+            }
+        }while(i!=21);
+    }
+
+    function choose(num) {
+        $('#title'+num);
+    }
+</script>
+</body>
+</html>
