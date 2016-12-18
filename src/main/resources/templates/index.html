@@ -83,27 +83,36 @@
                 <span th:text="${questions.question}"></span>
             </div>
             <div class="col-xs-11 col-sm-2">
-                <input type="radio" value="5" th:name="'question'+${stat.index+1}" onclick="choose(this.value)"/> 5分
+                <input type="radio" th:name="'question'+${stat.index+1}" value="5"
+                       th:onclick="'choose('+${stat.index+1}+');'"/> 5分
             </div>
             <div class="col-xs-11 col-sm-2">
-                <input type="radio" th:name="'question'+${stat.index+1}" value="4" onclick="choose(this.value)"/> 4分
+                <input type="radio" th:name="'question'+${stat.index+1}" value="4"
+                       th:onclick="'choose('+${stat.index+1}+');'"/> 4分
             </div>
             <div class="col-xs-11 col-sm-2">
-                <input type="radio" th:name="'question'+${stat.index+1}" value="3" onclick="choose(this.value)"/> 3分
+                <input type="radio" th:name="'question'+${stat.index+1}" value="3"
+                       th:onclick="'choose('+${stat.index+1}+');'"/> 3分
             </div>
             <div class="col-xs-11 col-sm-2">
-                <input type="radio" th:name="'question'+${stat.index+1}" value="2" onclick="choose(this.value)"/> 2分
+                <input type="radio" th:name="'question'+${stat.index+1}" value="2"
+                       th:onclick="'choose('+${stat.index+1}+');'"/> 2分
             </div>
             <div class="col-xs-11 col-sm-2">
-                <input type="radio" th:name="'question'+${stat.index+1}" value="1" onclick="choose(this.value)"/> 1分
+                <input type="radio" th:name="'question'+${stat.index+1}" value="1"
+                       th:onclick="'choose('+${stat.index+1}+');'"/> 1分
             </div>
             <br/>
         </div>
     </div>
 </div>
 
+
 <div class="row">
     <hr/>
+    <div style="padding-left: 10px;padding-right: 10px" id="errorMsg" class="hide">
+        <div class="alert alert-danger col-xs-12 col-sm-12">!!!</div>
+    </div>
     <div class="container">
         <div class="starter-template">
             <input type="submit" class="btn btn-primary" value="提交" onclick="submit()"/>
@@ -115,7 +124,7 @@
 <script th:src="@{bootstrap/js/bootstrap.min.js}" type="text/javascript"></script>
 
 <script th:inline="javascript">
-    var res=[];
+    var res = [];
     function change(department) {
         $.post("/department/persons", {department: department}, function (result) {
             $("#person").empty();
@@ -125,21 +134,26 @@
         });
     }
     function submit() {
-        var name = $("#person").val();
-        var i=0;
+        var i = 0;
         var notFull = [];
-        do{
+        do {
             i++;
-            var fen = $("input:radio[name='question"+i+"']:checked").val();
-            if(!fen){
+            var fen = $("input:radio[name='question" + i + "']:checked").val();
+            if (!fen) {
                 notFull.push(i);
-                $()
+                $('#title' + i).css("border", "1px red solid");
             }
-        }while(i!=21);
+        } while (i != 20);
+        if (notFull.length != 0) {
+            alert("对不起！您还有未完成的问题：" + notFull.join(","));
+        } else {
+            var name = $("#person").val();
+            console.log("可以提交");
+        }
     }
 
     function choose(num) {
-        $('#title'+num);
+        $('#title' + num).removeAttr("style");
     }
 </script>
 </body>
