@@ -9,9 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 
     <!-- bootstrap & fontawesome -->
-    <link th:href="@{css/bootstrap.min.css}" rel="stylesheet"/>
-    <link th:href="@{js/html5shiv.min.js}" rel="stylesheet"/>
-    <link th:href="@{js/respond.min.js}" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/respond.js/1.4.2/respond.min.js" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js" rel="stylesheet"/>
     <style type="text/css">
         body {
             padding: 20px;
@@ -31,6 +31,7 @@
             <th>姓名</th>
             <th>平均分</th>
             <th>问卷总数</th>
+            <th>详情</th>
         </tr>
         </thead>
         <tbody>
@@ -38,9 +39,89 @@
             <td th:text="${agg.name}"></td>
             <td th:text="${agg.res}"></td>
             <td th:text="${agg.scoreDetail}"></td>
+            <td>
+                <input type="submit" class="btn btn-primary" value="查看"  th:onclick="'getDetail(\''+${agg.name}+'\');'"/>
+            </td>
         </tr>
         </tbody>
     </table>
 </div>
+
+<div id="main" style="width: 600px;height:400px;"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/3.3.2/echarts.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.5/js/bootstrap.min.js"></script>
+<!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+<script type="text/javascript">
+
+    function getDetail(name) {
+        $.post("/result/"+name, function (result) {
+
+            // 基于准备好的dom，初始化echarts实例
+            var myChart = echarts.init(document.getElementById('main'));
+
+            // 指定图表的配置项和数据
+            var option = {
+           /*     title: {
+                    text: name+'的分数分布'
+                },
+                tooltip: {},
+                legend: {
+                    data:['']
+                },
+                xAxis: {
+                    data: ["1分","2分","3分","4分","5分"]
+                },
+                yAxis: {},
+                series: [{
+                    name: '销量',
+                    type: 'bar',
+                    data: result
+                }]*/
+                title : {
+                    text: name+'的分数分布',
+                    x:'center'
+                },
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    data: ["1分","2分","3分","4分","5分"]
+                },
+                series : [
+                    {
+                        name: '分数分布',
+                        type: 'pie',
+                        radius : '55%',
+                        center: ['50%', '60%'],
+                        data:[
+                            {value:result[0], name:'1分'},
+                            {value:result[1], name:'2分'},
+                            {value:result[2], name:'3分'},
+                            {value:result[3], name:'4分'},
+                            {value:result[4], name:'5分'}
+                        ],
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+
+            // 使用刚指定的配置项和数据显示图表。
+            myChart.setOption(option);
+            $('#myModal').modal();
+        });
+    }
+
+</script>
 </body>
 </html>

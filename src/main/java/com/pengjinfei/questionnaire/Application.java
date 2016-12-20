@@ -11,6 +11,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -108,5 +109,20 @@ public class Application {
         List<Score> aggrateResult = scoreRepository.getAggrateResult();
         model.addAttribute("aggRes",aggrateResult);
         return "result";
+    }
+
+    @RequestMapping("/result/{name}")
+    @ResponseBody
+    public Object getDetailByName(@PathVariable("name") String name) {
+        List<Score> scoreList = scoreRepository.findByName(name);
+        int[] distribute = new int[5];
+        for (Score score : scoreList) {
+            String scoreDetail = score.getScoreDetail();
+            String[] split = scoreDetail.split(",");
+            for (String s : split) {
+                distribute[Integer.parseInt(s)-1]++;
+            }
+        }
+        return distribute;
     }
 }
