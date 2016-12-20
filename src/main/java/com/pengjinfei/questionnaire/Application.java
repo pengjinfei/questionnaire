@@ -102,4 +102,11 @@ public class Application {
     public String success() {
         return "success";
     }
+
+    @RequestMapping("/result")
+    public String result(Model model) {
+        List<Score> aggrateResult = scoreRepository.getAggrateResult();
+        model.addAttribute("aggRes",aggrateResult);
+        return "result";
+    }
 }
