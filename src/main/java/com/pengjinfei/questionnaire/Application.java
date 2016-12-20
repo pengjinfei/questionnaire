@@ -11,15 +11,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Pengjinfei on 2016/12/17.
@@ -84,7 +82,9 @@ public class Application {
             Score score=new Score();
             score.setName(name);
             score.setScoreDetail(res);
-            score.setSuggestion(suggestion);
+            if (StringUtils.hasText(suggestion)) {
+                score.setSuggestion(suggestion);
+            }
             String[] split = res.split(",");
             int sum=0;
             for (String s : split) {
@@ -99,11 +99,6 @@ public class Application {
         return response;
     }
 
-    @RequestMapping("/success")
-    public String success() {
-        return "success";
-    }
-
     @RequestMapping("/result")
     public String result(Model model) {
         List<Score> aggrateResult = scoreRepository.getAggrateResult();
@@ -111,9 +106,9 @@ public class Application {
         return "result";
     }
 
-    @RequestMapping("/result/{name}")
+    @RequestMapping("/result/5/{name}")
     @ResponseBody
-    public Object getDetailByName(@PathVariable("name") String name) {
+    public Object get5DetailByName(@PathVariable("name") String name) {
         List<Score> scoreList = scoreRepository.findByName(name);
         int[] distribute = new int[5];
         for (Score score : scoreList) {
@@ -124,5 +119,29 @@ public class Application {
             }
         }
         return distribute;
+    }
+
+    @RequestMapping("/result/20/{name}")
+    @ResponseBody
+    public Object get20DetailByName(@PathVariable("name") String name) {
+        List<Score> scoreList = scoreRepository.findByName(name);
+        int[][] distribute = new int[5][20];
+        for (int i = 0; i <5; i++) {
+            Arrays.fill(distribute[i],0);
+        }
+        for (Score score : scoreList) {
+            String scoreDetail = score.getScoreDetail();
+            String[] split = scoreDetail.split(",");
+            for (int i = 0; i < split.length; i++) {
+                distribute[Integer.parseInt(split[i])-1][i]++;
+            }
+        }
+        return distribute;
+    }
+
+    @RequestMapping("/suggest/{name}")
+    @ResponseBody
+    public Object getSuggetsion(@PathVariable("name") String name) {
+        return scoreRepository.findByNameAndSuggestionNotNull(name);
     }
 }

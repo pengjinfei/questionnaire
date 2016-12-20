@@ -12,4 +12,6 @@ import java.util.List;
 public interface ScoreRepository extends CrudRepository<Score,Long>,ScoreRepositoryCustom {
 
     List<Score> findByName(String name);
+
+    List<Score> findByNameAndSuggestionNotNull(String name);
 }
